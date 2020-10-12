@@ -1,0 +1,1137 @@
+{
+	"info": {
+		"_postman_id": "fc7122e0-e2c7-4920-be16-a69caf55e275",
+		"name": "Uebermaps",
+		"description": "REST APIs tests using POSTMAN for [Uebermaps v2 APIs](https://uebermaps.com/api/v2/).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Maps",
+			"item": [
+				{
+					"name": "Create Map",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7afa751c-31e0-434a-8586-51578d31f52e",
+								"exec": [
+									"const mapData = {",
+									"    MAP_TITLE: \"map title at \",",
+									"    MAP_DESCRIPTION: \"map description at \",",
+									"    MAP_VISIBILITY: \"PUBLIC\"",
+									"};",
+									"",
+									"const editor_access = [",
+									"            \"can_administer.map\",",
+									"            \"can_administer.spots\",",
+									"            \"can_administer.events\",",
+									"            \"can_administer.comments\",",
+									"            \"can_administer.attachments\",",
+									"            \"can_administer.collaborators\"",
+									"        ];",
+									" const visitor_access = [",
+									"            \"can_administer.map\",",
+									"            \"can_administer.spots\",",
+									"            \"can_administer.events\",",
+									"            \"can_administer.comments\",",
+									"            \"can_administer.attachments\",",
+									"            \"can_administer.collaborators\"",
+									"        ];",
+									"",
+									"pm.collectionVariables.set('EDITOR_ACCESS', JSON.stringify(editor_access));",
+									"pm.collectionVariables.set('VISITOR_ACCESS', JSON.stringify(visitor_access));               ",
+									"Object.keys(mapData).forEach(key => {",
+									"    pm.collectionVariables.set(key, mapData[key]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "847526d9-a01a-4204-90b5-80f45b7ac64e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.collectionVariables.set('MAP_ID', pm.response.json().data.id);",
+									"});",
+									"",
+									"pm.test(`Map title is => ${pm.collectionVariables.get('MAP_TITLE')} ${pm.collectionVariables.get(\"timestamp\")}`, function () {",
+									"    const actualMapData = pm.response.json().data;",
+									"    pm.expect(actualMapData.title).to.eql(`${pm.collectionVariables.get('MAP_TITLE')} ${pm.collectionVariables.get(\"timestamp\")}`);   ",
+									"});",
+									"",
+									"pm.test(`Map description is => ${pm.collectionVariables.get('MAP_DESCRIPTION')} ${pm.collectionVariables.get(\"timestamp\")}`, function() {",
+									"    const actualMapData = pm.response.json().data;",
+									"    pm.expect(actualMapData.description).to.eql(`${pm.collectionVariables.get('MAP_DESCRIPTION')} ${pm.collectionVariables.get(\"timestamp\")}`);",
+									"});",
+									"",
+									"pm.test(`Map visibility is => ${pm.collectionVariables.get('MAP_VISIBILITY')}`, function() {",
+									"    const actualMapData = pm.response.json().data;",
+									"    pm.expect(actualMapData.visibility).to.eql(`${pm.collectionVariables.get('MAP_VISIBILITY')}`);",
+									"});",
+									"",
+									"pm.test(`Map editor access`, function() {",
+									"    const actualMapData = pm.response.json().data;",
+									"    pm.expect(JSON.stringify(actualMapData.map_settings.editor_access)).to.eql(pm.collectionVariables.get('EDITOR_ACCESS'));",
+									"});",
+									"",
+									"pm.test(`Map visitor access`, function() {",
+									"    const actualMapData = pm.response.json().data;",
+									"    pm.expect(JSON.stringify(actualMapData.map_settings.visitor_access)).to.eql(pm.collectionVariables.get('VISITOR_ACCESS'));",
+									"});",
+									"",
+									"pm.test(`Map user id is => ${pm.collectionVariables.get('USER_ID')}`, function() {",
+									"    const actualMapData = pm.response.json().data;",
+									"    pm.expect(actualMapData.user.id).to.eql(pm.collectionVariables.get('USER_ID'));",
+									"});",
+									"",
+									"pm.test(`Maps count is => ${pm.collectionVariables.get('MAPS_COUNT') + 1}`, function() {",
+									"    const actualMapData = pm.response.json().data;",
+									"    pm.expect(actualMapData.user.counts.maps).to.eql(pm.collectionVariables.get('MAPS_COUNT') + 1);",
+									"    pm.collectionVariables.set('MAPS_COUNT', pm.collectionVariables.get('MAPS_COUNT') + 1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"{{MAP_TITLE}} {{timestamp}}\",\n    \"description\": \"{{MAP_DESCRIPTION}} {{timestamp}}\",\n    \"visibility\": \"{{MAP_VISIBILITY}}\",\n    \"map_settings\": {\n        \"editor_access\": [\n            \"can_create.map\",\n            \"can_administer.spots\",\n            \"can_administer.events\",\n            \"can_administer.comments\",\n            \"can_administer.attachments\",\n            \"can_administer.collaborators\"\n        ],\n        \"visitor_access\": [\n            \"can_administer.map\",\n            \"can_administer.spots\",\n            \"can_administer.events\",\n            \"can_administer.comments\",\n            \"can_administer.attachments\",\n            \"can_administer.collaborators\"\n        ],\n        \"respotting_to_this_map\": true\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/maps",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"maps"
+							]
+						},
+						"description": "    create map request with valid token and data."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Map - unauthorized",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0179d1a9-ab41-4ddd-9046-eef2b2477440",
+								"exec": [
+									"const mapData = {",
+									"    MAP_TITLE: \"map title at \",",
+									"    MAP_DESCRIPTION: \"map description at \",",
+									"    MAP_VISIBILITY: \"PUBLIC\"",
+									"};",
+									"",
+									"const editor_access = [",
+									"            \"can_administer.map\",",
+									"            \"can_administer.spots\",",
+									"            \"can_administer.events\",",
+									"            \"can_administer.comments\",",
+									"            \"can_administer.attachments\",",
+									"            \"can_administer.collaborators\"",
+									"        ];",
+									" const visitor_access = [",
+									"            \"can_administer.map\",",
+									"            \"can_administer.spots\",",
+									"            \"can_administer.events\",",
+									"            \"can_administer.comments\",",
+									"            \"can_administer.attachments\",",
+									"            \"can_administer.collaborators\"",
+									"        ];",
+									"",
+									"pm.collectionVariables.set('EDITOR_ACCESS', JSON.stringify(editor_access));",
+									"pm.collectionVariables.set('VISITOR_ACCESS', JSON.stringify(visitor_access));               ",
+									"Object.keys(mapData).forEach(key => {",
+									"    pm.collectionVariables.set(key, mapData[key]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b44406f1-0293-4d54-bbda-dceb37211e72",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"{{MAP_TITLE}} {{timestamp}}\",\n    \"description\": \"{{MAP_DESCRIPTION}} {{timestamp}}\",\n    \"visibility\": \"{{MAP_VISIBILITY}}\",\n    \"map_settings\": {\n        \"editor_access\": [\n            \"can_create.map\",\n            \"can_administer.spots\",\n            \"can_administer.events\",\n            \"can_administer.comments\",\n            \"can_administer.attachments\",\n            \"can_administer.collaborators\"\n        ],\n        \"visitor_access\": [\n            \"can_administer.map\",\n            \"can_administer.spots\",\n            \"can_administer.events\",\n            \"can_administer.comments\",\n            \"can_administer.attachments\",\n            \"can_administer.collaborators\"\n        ],\n        \"respotting_to_this_map\": true\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/maps",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"maps"
+							]
+						},
+						"description": "    create map request with invalid token."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Map - Empty Body",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b8b9afad-6a34-4cdf-abe6-e3c1bf7e351f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "26fa40f3-dc36-475e-beda-6b5912e03544",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/maps",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"maps"
+							]
+						},
+						"description": "    create map request with invalid request body."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Maps",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "adb5c657-becb-4dfb-8e22-cc55ed092381",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "47ae9706-a72f-47e8-b9e8-dc0cf9dbb139",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Check maps count\", function () {",
+									"    const actualMapsCount = pm.response.json().meta.count;",
+									"    pm.expect(actualMapsCount).to.eql(pm.collectionVariables.get('MAPS_COUNT'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"type": "text",
+								"value": "",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/users/{{USER_ID}}/maps",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"{{USER_ID}}",
+								"maps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Map",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "048c6de8-1070-4f62-951e-c362712e0573",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "d5030a6f-d81d-4417-b35d-896ea13c0ae3",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"check get map data\", function () {",
+									"    const actualMapData = pm.response.json().data;",
+									"    pm.expect(actualMapData.id).to.eql(pm.collectionVariables.get('MAP_ID'));",
+									"    pm.expect(actualMapData.owner_id).to.eql(pm.collectionVariables.get('USER_ID'))",
+									"    pm.expect(actualMapData.title).to.eql(`${pm.collectionVariables.get('MAP_TITLE')} ${pm.collectionVariables.get(\"timestamp\")}`);",
+									"    pm.expect(actualMapData.description).to.eql(`${pm.collectionVariables.get('MAP_DESCRIPTION')} ${pm.collectionVariables.get(\"timestamp\")}`);",
+									"    pm.expect(actualMapData.visibility).to.eql(`${pm.collectionVariables.get('MAP_VISIBILITY')}`);",
+									"    pm.expect(actualMapData.user.id).to.eql(pm.collectionVariables.get('USER_ID'));",
+									"});",
+									"",
+									"pm.test(\"access group and access for map owner\", function () {",
+									"    const actualRelationMapData = pm.response.json().data.relation;",
+									"    pm.expect(actualRelationMapData.access_group).to.eql('owner');",
+									"    pm.expect(actualRelationMapData.access)",
+									"    actualRelationMapData.access.forEach(access => {",
+									"        pm.expect(access).to.include('can_administer.');",
+									"    });",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"type": "text",
+								"value": "",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/maps/{{MAP_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"maps",
+								"{{MAP_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Single Map",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6c20c2b1-bfb2-49cc-8460-0b9cf8b11680",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "30232838-7e57-4477-94ea-613b23259540",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"check updated map data\", function () {",
+									"    const actualMapData = pm.response.json().data;",
+									"    pm.expect(actualMapData.title).to.eql(`edited ${pm.collectionVariables.get('MAP_TITLE')} ${pm.collectionVariables.get(\"timestamp\")}`);",
+									"    pm.expect(actualMapData.description).to.eql(`edited ${pm.collectionVariables.get('MAP_DESCRIPTION')} ${pm.collectionVariables.get(\"timestamp\")}`);",
+									"    pm.expect(actualMapData.visibility).to.eql(\"PRIVATE\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "",
+								"type": "text",
+								"value": "",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"edited {{MAP_TITLE}} {{timestamp}}\",\n    \"description\": \"edited {{MAP_DESCRIPTION}} {{timestamp}}\",\n    \"visibility\": \"private\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/maps/{{MAP_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"maps",
+								"{{MAP_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Map",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "4da63401-a085-4cf9-9c83-39484d8e796f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a72f78c9-3e97-4e95-8fc1-ee6e057c299a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('map is deleted', function () {",
+									"    pm.sendRequest(`${pm.collectionVariables.get('BASE_URL')}/maps/${pm.collectionVariables.get('MAP_ID')}`, (err, response) => {",
+									"        pm.expect(response.code).to.eql(404);",
+									"        pm.expect(response.status).to.eql(\"Not Found\");",
+									"    })",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "",
+								"type": "text",
+								"value": "",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/maps/{{MAP_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"maps",
+								"{{MAP_ID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Find list of APIs tested in this folder [here](https://uebermaps.com/api/v2#resource_Maps).",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ac30d220-69d2-44d7-a916-656b87af2cef",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "f7cabebf-6a77-4869-ba83-3798f066cb94",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "Create Comment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a65bc6e0-25ba-44cc-a6ea-abfc0091d357",
+								"exec": [
+									"pm.sendRequest(`${pm.collectionVariables.get(\"BASE_URL\")}/users/${pm.collectionVariables.get(\"USER_ID\")}/maps`, (err, response) => {",
+									"    // set random map id from user maps list",
+									"    const userMapsIds = response.json().data.map(map => map.id);",
+									"    pm.collectionVariables.set('MAP_ID',userMapsIds[Math.floor(Math.random() * (userMapsIds.length + 1))]);",
+									"});",
+									"",
+									"pm.collectionVariables.set('COMMENT_BODY', \"This city is wonderful I was there at\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa3b9d8f-ce3a-4de0-b725-71ada43a01af",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.collectionVariables.set('COMMENT_ID', pm.response.json().data.id);",
+									"    pm.collectionVariables.set('COMMENT_DATA', JSON.stringify(pm.response.json().data));",
+									"});",
+									"const commentBody = `${pm.collectionVariables.get('COMMENT_BODY')} ${pm.collectionVariables.get('timestamp')}`;",
+									"",
+									"pm.test(`Comment body is => ${commentBody}`, function() {",
+									"    pm.expect(pm.response.json().data.body).to.eql(commentBody);",
+									"});",
+									"",
+									"pm.test(`Comment user id is => ${pm.collectionVariables.get('USER_ID')}`, function () {",
+									"    pm.expect(pm.response.json().data.user.id).to.eql(pm.collectionVariables.get('USER_ID'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"body\": \"{{COMMENT_BODY}} {{timestamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/maps/{{MAP_ID}}/comments",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"maps",
+								"{{MAP_ID}}",
+								"comments"
+							]
+						},
+						"description": "    add comment request to certain map"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Map Comments",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "02dfab2e-0140-4da6-89a6-f5ab673f2db5",
+								"exec": [
+									"pm.sendRequest(`${pm.collectionVariables.get(\"BASE_URL\")}/maps/${pm.collectionVariables.get('MAP_ID')}`, (err, response) => {",
+									"    // set map comments count",
+									"    pm.collectionVariables.set('COMMENTS_COUNT', response.json().data.counts.comments);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "594c2370-2a94-4b84-bf67-63728f193ab9",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const mapCommentsCount = pm.collectionVariables.get('COMMENTS_COUNT');",
+									"",
+									"pm.test(`Map comments count is => ${mapCommentsCount}`, function() {",
+									"    pm.expect(pm.response.json().data.length).to.eql(mapCommentsCount);",
+									"});",
+									"",
+									"pm.test(`check Map comment data`, function() {",
+									"    const mapComments = pm.response.json().data;",
+									"    const actualComment = mapComments.find(comment => comment.id == pm.collectionVariables.get('COMMENT_ID'));",
+									"    pm.expect(JSON.stringify(actualComment)).to.eql(pm.collectionVariables.get('COMMENT_DATA'))",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/maps/{{MAP_ID}}/comments",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"maps",
+								"{{MAP_ID}}",
+								"comments"
+							]
+						},
+						"description": "    get comments request for certain map"
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Comment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6c04491a-b358-4bd2-a5d2-05c958d2ed92",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c74cb877-2445-47af-8b63-2186fb23ab3d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const commentBody = `edited ${pm.collectionVariables.get('COMMENT_BODY')} ${pm.collectionVariables.get('timestamp')}`;",
+									"",
+									"pm.test(`Comment body is => ${commentBody}`, function() {",
+									"    pm.expect(pm.response.json().data.body).to.eql(commentBody);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"body\": \"edited {{COMMENT_BODY}} {{timestamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/comments/{{COMMENT_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"comments",
+								"{{COMMENT_ID}}"
+							]
+						},
+						"description": "    edit comment request"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Comment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b5403fae-a7e4-4f18-8681-6aee2cc3bdfb",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2f166cd8-f1e9-42ee-94e3-1dc50f17f66a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const mapCommentsCount = pm.collectionVariables.get('COMMENTS_COUNT');",
+									"",
+									"pm.test(`Map comments don't have deleted comment with id ${pm.collectionVariables.get('COMMENT_ID')}`, function() {",
+									"    pm.sendRequest(`${pm.collectionVariables.get(\"BASE_URL\")}/maps/${pm.collectionVariables.get(\"MAP_ID\")}/comments`, (err, response) => {",
+									"        const mapComments = response.json().data;",
+									"        const deletedComment = mapComments.find(comment => comment.id == pm.collectionVariables.get('COMMENT_ID'));",
+									"        pm.expect(deletedComment).to.eql(undefined);",
+									"        pm.expect(mapComments.length).to.eql(mapCommentsCount - 1);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "auth_token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/comments/{{COMMENT_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"comments",
+								"{{COMMENT_ID}}"
+							]
+						},
+						"description": "    delete comment request"
+					},
+					"response": []
+				}
+			],
+			"description": "Find list of APIs tested in this folder [here](https://uebermaps.com/api/v2#resource_Comments).",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "aaa02e0e-f140-4fc1-92f1-49d68f7b0c47",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0c13e829-50ac-4426-89cf-b5e12ccb88c9",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9f38680a-cde7-4395-a8f1-2281c5d1e5bb",
+				"type": "text/javascript",
+				"exec": [
+					"const username = pm.environment.get('username');",
+					"const password = pm.environment.get('password');",
+					"",
+					"const tokenRequest = {",
+					"  url: `https://uebermaps.com/api/v2/authentication/?user%5Bemail%5D=${username}&user%5Bpassword%5D=${password}`,",
+					"  method: 'POST',",
+					"  header: {",
+					"      \t'content-type': 'application/json',",
+					"  }",
+					"};",
+					"",
+					"pm.sendRequest(tokenRequest, function (err, response) {",
+					"    pm.collectionVariables.set(\"AUTH_TOKEN\", response.json().data.auth_token);",
+					"    pm.collectionVariables.set(\"USER_ID\", response.json().data.id);",
+					"    pm.collectionVariables.set(\"MAPS_COUNT\", response.json().data.counts.maps);",
+					"});",
+					"",
+					"",
+					"const moment = require('moment');",
+					"pm.collectionVariables.set(\"timestamp\", moment().format(\"DD/MM/YYYY hh\"));"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "4b8cde9c-e17f-4100-9797-0d7f2e21fb98",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "08050f38-518f-42d6-b54e-d61cedd796e7",
+			"key": "BASE_URL",
+			"value": "https://uebermaps.com/api/v2"
+		},
+		{
+			"id": "459ca1d6-04d2-437a-99cd-61d42bc3b064",
+			"key": "AUTH_TOKEN",
+			"value": ""
+		},
+		{
+			"id": "1dc196ea-a50b-431e-8f99-4884a8aa00f2",
+			"key": "timestamp",
+			"value": ""
+		},
+		{
+			"id": "7f63bc75-e7af-47fb-8787-49eea2333ba0",
+			"key": "MAPS_COUNT",
+			"value": ""
+		},
+		{
+			"id": "d4c6b2d6-9998-4911-8ecb-9d76eb56b83a",
+			"key": "USER_ID",
+			"value": ""
+		},
+		{
+			"id": "7bf8da79-0f3b-4a2e-9563-9819da85ddba",
+			"key": "MAP_ID",
+			"value": ""
+		},
+		{
+			"id": "bba8e34d-8f20-4cfa-9191-3aff5bfc3f9a",
+			"key": "MAP_TITLE",
+			"value": ""
+		},
+		{
+			"id": "ddca94fe-8d43-4f8b-9b6f-adb1eb138dc6",
+			"key": "EDITOR_ACCESS",
+			"value": ""
+		},
+		{
+			"id": "6fba7e7d-f183-4207-a4cb-270ba9f1c95b",
+			"key": "MAP_DESCRIPTION",
+			"value": ""
+		},
+		{
+			"id": "e9687580-1c82-4c60-ae70-aad940854b07",
+			"key": "MAP_VISIBILITY",
+			"value": ""
+		},
+		{
+			"id": "a0fe7428-5da5-46eb-bdad-733c744fd849",
+			"key": "VISITOR_ACCESS",
+			"value": ""
+		},
+		{
+			"id": "44096cc0-86e1-4023-8406-845a8536b1c4",
+			"key": "COMMENT_BODY",
+			"value": ""
+		},
+		{
+			"id": "b2d60bb1-65bd-42c4-a78f-d0de21e33b9b",
+			"key": "COMMENT_ID",
+			"value": ""
+		},
+		{
+			"id": "378352a3-eef9-4ecb-807c-4a54eec32d4d",
+			"key": "COMMENT_DATA",
+			"value": ""
+		},
+		{
+			"id": "565c9f78-64c7-4e4b-a17e-f10dc48835bb",
+			"key": "COMMENTS_COUNT",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}
