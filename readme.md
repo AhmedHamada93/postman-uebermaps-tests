@@ -19,15 +19,15 @@ To view requests and tests in POSTMAN
 - To run tests using newman CLI use `newman run Uebermaps.postman_collection.json -r html -e Dev.postman_environment.json` at **Uebermaps.postman_collection.json** directory.
 
 ## Bug Report
-[Find Bug Report Here](https://git.toptal.com/screening/ahmed-hamada/blob/master/2_API_Tests/bug-report.md)
+[Find Bug Report Here](https://github.com/AhmedHamada93/postman-uebermaps-tests/blob/master/bug-report.md)
 
 ## Report
 At collections directory you will find the generated html report at `newman\newman-run-report-timestamp.html` 
 
-Find HTML report [here](https://git.toptal.com/screening/ahmed-hamada/blob/master/2_API_Tests/newman/newman-run-report-2020-09-15-20-54-12-722-0.html)
+Find HTML report [here](https://github.com/AhmedHamada93/postman-uebermaps-tests/blob/master/newman/newman-run-report-2020-09-15-20-54-12-722-0.html)
 
 Report Examples
 
-![report-screenshot-1](https://git.toptal.com/screening/ahmed-hamada/raw/master/2_API_Tests/newman/screenshot-1.png)
+![report-screenshot-1](https://github.com/AhmedHamada93/postman-uebermaps-tests/blob/master/newman/screenshot-1.png)
 
-![report-screenshot-2](https://git.toptal.com/screening/ahmed-hamada/raw/master/2_API_Tests/newman/screenshot-2.png)
+![report-screenshot-2](https://github.com/AhmedHamada93/postman-uebermaps-tests/blob/master/newman/screenshot-2.png)
